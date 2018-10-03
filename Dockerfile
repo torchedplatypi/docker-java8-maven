@@ -1,10 +1,10 @@
 # Ubuntu 16.04
-# Oracle Java 1.8.0_101 64 bit
-# Maven 3.3.9
+# Oracle Java 1.8.0_131 64 bit
+# Maven 3.5.4
 
 FROM ubuntu:16.04
 
-MAINTAINER Kai Winter (https://github.com/kaiwinter)
+MAINTAINER Alex Moore (https://github.com/torchedplatypi)
 
 # this is a non-interactive automated build - avoid some warning messages
 ENV DEBIAN_FRONTEND noninteractive
@@ -16,28 +16,29 @@ RUN apt-get update
 RUN apt-get install -y wget
 
 # get maven 3.3.9
-RUN wget --no-verbose -O /tmp/apache-maven-3.3.9.tar.gz http://archive.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
+RUN wget --no-verbose -O /tmp/apache-maven-3.5.4.tar.gz http://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz
 
 # verify checksum
-RUN echo "516923b3955b6035ba6b0a5b031fbd8b /tmp/apache-maven-3.3.9.tar.gz" | md5sum -c
+RUN echo "89eea39183139e5f8a0c1601d495b3b6 /tmp/apache-maven-3.5.4.tar.gz" | md5sum -c
 
 # install maven
-RUN tar xzf /tmp/apache-maven-3.3.9.tar.gz -C /opt/
-RUN ln -s /opt/apache-maven-3.3.9 /opt/maven
+RUN tar xzf /tmp/apache-maven-3.5.4.tar.gz -C /opt/
+RUN ln -s /opt/apache-maven-3.5.4 /opt/maven
 RUN ln -s /opt/maven/bin/mvn /usr/local/bin
-RUN rm -f /tmp/apache-maven-3.3.9.tar.gz
+RUN rm -f /tmp/apache-maven-3.5.4.tar.gz
 ENV MAVEN_HOME /opt/maven
 
 # remove download archive files
 RUN apt-get clean
 
 # set shell variables for java installation
-ENV java_version 1.8.0_101
-ENV filename jdk-8u101-linux-x64.tar.gz
-ENV downloadlink http://download.oracle.com/otn-pub/java/jdk/8u101-b13/$filename
+ENV java_version 1.8.0_131
+ENV filename jdk-8u131-linux-x64.tar.gz
+# this is some fragile bs, who knows when oracle feels like changing this d54c1d... checksum
+ENV downloadlink http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/$filename
 
 # download java, accepting the license agreement
-RUN wget --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" -O /tmp/$filename $downloadlink 
+RUN wget -c --header "Cookie: oraclelicense=accept-securebackup-cookie" -O /tmp/$filename $downloadlink
 
 # unpack java
 RUN mkdir /opt/java-oracle && tar -zxf /tmp/$filename -C /opt/java-oracle/
